@@ -1,0 +1,37 @@
+name: CloudGuard Code Security
+
+on: push
+
+env:
+  SPECTRAL_DSN: ${{ secrets.SPECTRAL_DSN }}
+  
+  # JFrog platform url (for example: https://acme.jfrog.io)
+  JF_URL: ${{ vars.JF_URL }}
+
+  # JFrog Platform access token
+  JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+
+jobs:
+  spectral:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: CloudGuard Code Security Scan
+        uses: checkpointsw/spectral-github-action@v4
+        with:
+          spectral-dsn: ${{ env.SPECTRAL_DSN }}
+          spectral-args: scan --fail-on-error --engines secrets,iac,oss --asset-mapping github.${{ github.repository_owner }}
+  jas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jfrog/setup-jfrog-cli@v4
+      - run: |
+          jf audit --sca --iac --secrets --sast
+  xray:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jfrog/setup-jfrog-cli@v4
+      - run: |
+          jf s "*"
