@@ -10,6 +10,8 @@ env:
 
   # JFrog Platform access token
   JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+  
+  SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
 jobs:
   spectral:
@@ -21,17 +23,58 @@ jobs:
         with:
           spectral-dsn: ${{ env.SPECTRAL_DSN }}
           spectral-args: scan --fail-on-error --engines secrets,iac,oss --asset-mapping github.${{ github.repository_owner }}
-  jas:
+  audit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: jfrog/setup-jfrog-cli@v4
       - run: |
           jf audit --sca --iac --secrets --sast
-  xray:
+  snyk-code:
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
     steps:
       - uses: actions/checkout@v4
-      - uses: jfrog/setup-jfrog-cli@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Snyk to check for code vulnerabilities
+        id: snyk_code 
+        uses: snyk/actions/node@master
+        with:
+          command: code test
+          args: --sarif-file-output=snyk/code.sarif 
+
       - run: |
-          jf s "*"
+          cat snyk/code.sarif 
+
+      - name: Upload sarif files
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'snyk/'
+
+  snyk-dependency:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 
+
+      - name: Run Snyk to check for dependency vulnerabilities
+        uses: snyk/actions/node@master
+        with:
+          command: test
+          args: --sarif-file-output=snyk/dependencies.sarif --all-projects 
+
+      - run: |
+          cat snyk/dependencies.sarif
+
+      - name: Upload sarif files
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'snyk/'
