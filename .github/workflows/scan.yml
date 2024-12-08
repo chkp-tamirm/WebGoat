@@ -46,7 +46,8 @@ jobs:
           command: code test
           args: --sarif-file-output=snyk/code.sarif 
 
-      - run: |
+      - if: always()
+        run: |
           cat snyk/code.sarif 
 
       - name: Upload sarif files
@@ -70,7 +71,8 @@ jobs:
           command: test
           args: --sarif-file-output=snyk/dependencies.sarif --all-projects 
 
-      - run: |
+      - if: always()
+        run: |
           cat snyk/dependencies.sarif
 
       - name: Upload sarif files
