@@ -30,6 +30,33 @@ jobs:
       - uses: jfrog/setup-jfrog-cli@v4
       - run: |
           jf audit --sca --iac --secrets --sast
+
+  snyk-iac:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Snyk to check for code vulnerabilities
+        id: snyk_code 
+        uses: snyk/actions/node@master
+        with:
+          command: code iac test
+          args: --sarif-file-output=snyk/iac.sarif 
+
+      - if: always()
+        run: |
+          cat snyk/iac.sarif 
+
+      - name: Upload sarif files
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'snyk/'
+
   snyk-code:
     runs-on: ubuntu-latest
     permissions:
