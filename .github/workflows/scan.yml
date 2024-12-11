@@ -19,13 +19,13 @@ jobs:
 
   semgrep:
     runs-on: ubuntu-latest
-      container:
-        image: semgrep/semgrep
+    container:
+      image: semgrep/semgrep
 
-      steps:
-        - uses: actions/checkout@v4
-        - run: |
-            semgrep ci --code --secrets --supply-chain
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          semgrep ci --code --secrets --supply-chain
 
   spectral:
     runs-on: ubuntu-latest
