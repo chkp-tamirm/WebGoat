@@ -13,7 +13,20 @@ env:
   
   SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
+  SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_TOKEN }}
+
 jobs:
+
+  semgrep:
+    runs-on: ubuntu-latest
+      container:
+        image: semgrep/semgrep
+
+      steps:
+        - uses: actions/checkout@v4
+        - run: |
+            semgrep ci --code --secrets --supply-chain
+
   spectral:
     runs-on: ubuntu-latest
     steps:
@@ -23,13 +36,25 @@ jobs:
         with:
           spectral-dsn: ${{ env.SPECTRAL_DSN }}
           spectral-args: scan --fail-on-error --engines secrets,iac,oss --asset-mapping github.${{ github.repository_owner }}
-  audit:
+  
+  audit-code:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: jfrog/setup-jfrog-cli@v4
       - run: |
-          jf audit --sca --iac --secrets --sast
+          jf audit --iac --secrets --sast --format json | tee code
+      - uses: Teebra/JSON-to-HTML-table@v2.0.0
+        with:
+          json-file: path/to/your/jsonfile.json
+
+  audit-dependency:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jfrog/setup-jfrog-cli@v4
+      - run: |
+          jf audit --sca
 
   snyk-iac:
     runs-on: ubuntu-latest
