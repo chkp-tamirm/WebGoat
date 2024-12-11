@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          semgrep ci --code --secrets --supply-chain
+          semgrep ci --code --secrets --supply-chain --no-suppress-errors
 
   spectral:
     runs-on: ubuntu-latest
