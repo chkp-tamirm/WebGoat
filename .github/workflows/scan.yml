@@ -43,6 +43,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: jfrog/setup-jfrog-cli@v4
       - run: |
+          export JFROG_CLI_LOG_LEVEL=DEBUG
           jf audit --iac --secrets --sast  --sca | tee code
 
   # jfrog-dependency:
