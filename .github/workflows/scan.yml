@@ -43,18 +43,15 @@ jobs:
       - uses: actions/checkout@v4
       - uses: jfrog/setup-jfrog-cli@v4
       - run: |
-          jf audit --iac --secrets --sast --format json | tee code
-      - uses: Teebra/JSON-to-HTML-table@v2.0.0
-        with:
-          json-file: path/to/your/jsonfile.json
+          jf audit --iac --secrets --sast  --sca | tee code
 
-  jfrog-dependency:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: jfrog/setup-jfrog-cli@v4
-      - run: |
-          jf audit --sca
+  # jfrog-dependency:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: jfrog/setup-jfrog-cli@v4
+  #     - run: |
+  #         jf audit --sca
 
   snyk-iac:
     runs-on: ubuntu-latest
