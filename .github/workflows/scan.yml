@@ -16,6 +16,21 @@ env:
   SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_TOKEN }}
 
 jobs:
+  sonar:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0    
+    - name: SonarQube Scan
+      uses: sonarsource/sonarcloud-github-action@v4.0.0
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    - name: Upload Sonar Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: sonar-report
+        path: sonar-report.html
 
   semgrep:
     runs-on: ubuntu-latest
