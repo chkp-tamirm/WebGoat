@@ -29,8 +29,7 @@ jobs:
         java-version: '11' # Update to match your project requirements
     - name: Build Java project
       run: |
-        ./gradlew build # For Gradle
-        # Or use: mvn clean install -DskipTests # For Maven        
+        mvn clean install -DskipTests # For Maven        
     - name: SonarQube Scan
       uses: sonarsource/sonarcloud-github-action@v4.0.0
       env:
@@ -137,7 +136,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 
+          fetch-depth: 0
 
       - name: Run Snyk to check for dependency vulnerabilities
         uses: snyk/actions/node@master
