@@ -21,7 +21,16 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        fetch-depth: 0    
+        fetch-depth: 0
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11' # Update to match your project requirements
+    - name: Build Java project
+      run: |
+        ./gradlew build # For Gradle
+        # Or use: mvn clean install -DskipTests # For Maven        
     - name: SonarQube Scan
       uses: sonarsource/sonarcloud-github-action@v4.0.0
       env:
